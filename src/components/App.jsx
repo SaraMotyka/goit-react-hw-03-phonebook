@@ -48,10 +48,11 @@ export class App extends Component {
 
   filteredContacts = () => {
     const { filter, contacts } = this.state;
-
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
-    );
+    if ('contacts' in localStorage) {
+      return contacts.filter(contact =>
+        contact.name.toLowerCase().includes(filter.toLowerCase())
+      );
+    }
   };
 
   deleteContact = id =>
