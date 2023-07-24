@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { ContactForm } from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
+import { nanoid } from 'nanoid';
 
 export class App extends Component {
   constructor() {
@@ -18,8 +19,10 @@ export class App extends Component {
   }
 
   componentDidMount() {
-    const storedContact = localStorage.getItem('contacts');
-    this.setState({ contacts: JSON.parse(storedContact) });
+    if ('contacts' in localStorage) {
+      const storedContact = localStorage.getItem('contacts');
+      this.setState({ contacts: JSON.parse(storedContact) });
+    }
   }
 
   componentDidUpdate() {
@@ -27,17 +30,18 @@ export class App extends Component {
   }
 
   addContact = event => {
-    const loweredCase = event.name.toLowerCase().trim();
+    const { name, number } = event;
+    const loweredCase = name.toLowerCase().trim();
 
     const exists = this.state.contacts.some(
       contact => contact.name.toLowerCase().trim() === loweredCase
     );
 
     if (exists) {
-      alert(`${event.name} is already in contacts!`);
+      alert(`${name} is already in contacts!`);
     } else {
       this.setState(({ contacts }) => ({
-        contacts: [...contacts, event],
+        contacts: [...contacts, { id: nanoid(), name, number }],
       }));
     }
   };
@@ -48,11 +52,13 @@ export class App extends Component {
 
   filteredContacts = () => {
     const { filter, contacts } = this.state;
-    if ('contacts' in localStorage) {
-      return contacts.filter(contact =>
+
+    return (
+      contacts &&
+      contacts.filter(contact =>
         contact.name.toLowerCase().includes(filter.toLowerCase())
-      );
-    }
+      )
+    );
   };
 
   deleteContact = id =>
